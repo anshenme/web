@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <style media="screen">
+      .box {width: 400px; height: 150px; border: 1px solid black; background: #CCC; position: absolute; margin-left: -200px;
+        margin-top: -75px; left: 50%; top: 50%; text-align: center; line-height: 150px; display: none;}
+    </style>
+    <script>
+      window.onload=function () {
+        let oBox=document.querySelector('.box');
+        //定时器
+        let timer;
+
+        document.addEventListener('dragover',(ev)=>{
+          clearTimeout(timer);
+
+          oBox.style.display='block';
+
+          timer=setTimeout(function () {
+            oBox.style.display='none';
+          },300);
+
+          //清掉，这里是绑定所以不可以用return
+          //不清掉会直接打开上传的文件
+          //如果dragover不阻止默认事件，ondrop就不会发生
+          ev.preventDefault();
+        },false);
+
+
+        oBox.addEventListener('ondragenter',()=>{
+          oBox.innerHTML='请松手上传';
+        },false);
+        oBox.addEventListener('ondragleave',()=>{
+          oBox.innerHTML='请拖到这里';
+        },false);
+
+        //ev事件对象，是事件里面传递数据的一个方法
+        oBox.addEventListener('drop',(ev)=>{
+          let file = ev.dataTransfer.files[0];
+
+          //读取文件
+          let reader = new FileReader();
+
+          reader.onload=function () {
+            document.write(reader.result);
+          };
+
+          /*
+          //文本
+          reader.readAsText(file);
+          */
+
+          //base64,可以把二进制数据表现成字符串
+          reader.readAsDataURL(file);
+
+          ev.preventDefault();
+        },false);
+      };
+    </script>
+  </head>
+
+  <body>
+    <div class="box">
+      拖到这里
+    </div>
+  </body>
+</html>

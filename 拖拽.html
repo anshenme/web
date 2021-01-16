@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <style media="screen">
+      .box {width: 400px; height: 150px; border: 1px solid black; background: #CCC; position: absolute; margin-left: -200px;
+        margin-top: -75px; left: 50%; top: 50%; text-align: center; line-height: 150px; display: none;}
+    </style>
+    <script>
+      window.onload=function () {
+        let oBox=document.querySelector('.box');
+        //定时器
+        let timer;
+
+        document.addEventListener('dragover',(ev)=>{
+          clearTimeout(timer);
+
+          oBox.style.display='block';
+
+          timer=setTimeout(function () {
+            oBox.style.display='none';
+          },300);
+
+          //清掉，这里是绑定所以不可以用return
+          //不清掉会直接打开上传的文件
+          //如果dragover不阻止默认事件，ondrop就不会发生
+          ev.preventDefault();
+        },false);
+
+
+        oBox.addEventListener('ondragenter',()=>{
+          oBox.innerHTML='请松手上传';
+        },false);
+        oBox.addEventListener('ondragleave',()=>{
+          oBox.innerHTML='请拖到这里';
+        },false);
+
+        //ev事件对象，是事件里面传递数据的一个方法
+        oBox.addEventListener('drop',(ev)=>{
+          let data=new FormData();
+          Array.from(ev.dataTransfer.files).forEach(file => {
+            data.append('f1', file);
+          });
+
+          let oAjax=new XMLHttpRequest();
+
+          //POST
+          oAjax.open('POST', `http://localhost:8080/api`, true);
+
+          oAjax.upload.addEventListener('progress',function (ev) {
+            let oM = document.getElementById('m1');
+            oM.value = 100*ev.loaded/ev.total;
+          },false);
+
+          oAjax.send(data);
+
+          ev.preventDefault();
+
+          oAjax.onreadystatechange=function () {
+            if(oAjax.readyState==4){
+              if (oAjax.status>=200 && oAjax.status<300 || oAjax.status==304) {
+                alert('成功');
+              } else {
+                alert('失败');
+              }
+            }
+          };
+        },false);
+      };
+    </script>
+  </head>
+
+  <body>
+    <meter id="m1" value="" min="0" max="100" style="width:500px;"></meter>
+    <div class="box">
+      拖到这里
+    </div>
+  </body>
+</html>
