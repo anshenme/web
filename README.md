@@ -2038,15 +2038,21 @@ server.use(express.static('./public/www/'));
 
 ### HTML5  
 1、geolocation 定位  
+    PC端：通过IP地址    精度非常差   IP库   
+    移动：GPS硬件设备       精度高  
 2、video、audio  
-3、localStorage  
+3、localStorage     用途：记录用户名、保存草稿……  
     cookie:         小4k，浏览器和服务器共享  
-    localStorage    大5M，浏览器独享  
-4、*WebWorker   多进程  
+    localStorage    大5M，浏览器独享，永久存储  
+    sessionStorage  会话期间存储
+4、*WebWorker   多进程，工作中没用过  
 5、WebSQL、IndexedDB 安全隐患  
     *W3C删掉了  
 6、文件操作、文件拖拽  
-7、canvas 画图  
-    SVG/VML  
+7、canvas 画位图    作用：图表库echarts.js、游戏、滤镜
+    路径问题、像素操作、d3  
+    SVG/VML 矢量图  
 8、manifest文件     前台控制缓存  
-9、CSS3  
+9、CSS3新样式
+10、移动端布局、事件touch、相关库  iscroll、hammer
+11、canvas高级应用   游戏、WebGL  
