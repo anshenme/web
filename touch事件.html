@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+  <head>
+    <meta charset="utf-8">
+    <title></title>
+    <style media="screen">
+      .box {width:200px; height:200px; background:#ccc; position:absolute; left:0; top:0;}
+    </style>
+    <script>
+      window.onload=function(){
+        //获取对象
+        let oBox=document.getElementsByClassName('box')[0];
+        //添加事件，任何事件都有事件对象ev
+        oBox.addEventListener('touchstart',function(ev){
+          //console.log(ev.targetTouches[0].clientX);
+          let disX=ev.targetTouches[0].clientX-oBox.offsetLeft;
+          let disY=ev.targetTouches[0].clientY-oBox.offsetTop;
+
+          //匿名函数不能删，所以这里不能用
+          function fnMove(ev) {
+            oBox.style.left=ev.targetTouches[0].clientX-disX+'px';
+            oBox.style.top=ev.targetTouches[0].clientY-disY+'px';
+          }
+
+          function fnEnd() {
+            oBox.removeEventListener('touchmove', fnMove, false);
+            oBox.removeEventListener('touchend', fnEnd, false);
+          }
+
+          oBox.addEventListener('touchmove', fnMove, false);
+          oBox.addEventListener('touchend', fnEnd, false);
+        },false);
+      };
+    </script>
+  </head>
+
+  <body>
+    <div class="box">
+
+    </div>
+  </body>
+</html>
