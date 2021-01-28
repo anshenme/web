@@ -46,5 +46,15 @@ server.use('/api',(req, res)=>{
   });
 });
 
+server.use('/api2',(req, res)=>{
+  //console.log(req.method, req.url);
+  //跨域
+  if(req.headers['origin']=='null' || req.headers['origin'].startsWith('http://localhost')){
+    res.setHeader('Access-Control-Allow-Origin','*');
+  }
+
+  res.send("ok");
+});
+
 
 server.use(express.static('./www/'));

@@ -15,6 +15,42 @@
     </style>
     <script>
       window.onload=function () {
+        let oF=document.getElementById('f1');
+        let oBtn=document.getElementById('btn1');
+
+        //上传代码
+        oBtn.onclick=function () {
+          let data=new FormData();
+
+          Array.from(oF.files).forEach(file => {
+            data.append('f1', file);
+          });
+
+          let oAjax=new XMLHttpRequest();
+
+          //POST
+          oAjax.open('POST', `http://localhost:8080/api2`, true);
+
+          oAjax.upload.addEventListener('progress',function (ev) {
+            let oM = document.getElementById('m1');
+
+            oM.value = 100*ev.loaded/ev.total;
+          },false);
+
+          oAjax.send(data);
+
+          oAjax.onreadystatechange=function () {
+            if(oAjax.readyState==4){
+              if (oAjax.status>=200 && oAjax.status<300 || oAjax.status==304) {
+                alert('成功');
+              } else {
+                alert('失败');
+              }
+            }
+          };
+        };
+
+        //拖拽代码
         let oUl=document.querySelector('.img_list');
         let oBox=document.querySelector('.box');
         //定时器
@@ -105,6 +141,9 @@
   </head>
 
   <body>
+    <meter id="m1" value="" min="0" max="100" style="width:500px;"></meter>
+    <input type="file" id="f1" multiple /><br>
+    <input type="button" value="选择文件上传" id="btn1"><br>
     <ul class="img_list">
       <!--<li>
         <img src="1.jpg" alt="">
@@ -115,7 +154,7 @@
         <a href="javascript:;" class="del_btn">删除</a>
       </li>-->
     </ul>
-    <input type="button" name="" value="上传" id="btn_upload">
+    <input type="button" name="" value="拖拽上传" id="btn_upload">
     <div class="box">
       拖到这里
     </div>
