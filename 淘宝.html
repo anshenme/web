@@ -3,48 +3,165 @@
   <head>
     <meta charset="utf-8">
     <title></title>
+    <meta name="viewport" content="width=device-width">
     <style media="screen">
-      * {margin:0;padding: 0;list-style: none; overflow: hidden;}
+      * {margin:0;padding: 0;list-style: none;}
       html{font-size: 10px}
 
-      header{width: 41.4rem; height: 3.7rem; background: #ff852a}
+      header{width: 41.4rem; height: 3.7rem; background: #ff852a; overflow: hidden; position: relative; z-index: 99;}
 
       header h1{width: 2.6rem; height: 2rem; background:url(img/logo.png) no-repeat; text-indent: -9999rem; background-size: 100%; margin-left: 1rem; margin-top: 0.9rem;}
 
       /*banner*/
       .banner {width: 41.4rem; height: 15rem; position: relative; overflow: hidden;}
-      .banner ul {width: 999rem; height: 15rem; overflow: hidden; transform: translateX(0rem);}
+      .banner ul {width: 999rem; height: 15rem; overflow: hidden; transform: translateX(-41.4rem);}
       .banner ul li {width: 41.4rem; height: 15rem; float: left;}
       .banner ul li img {width: 100%; height: 100%;}
       .banner ol {position: absolute; right: 0; bottom: 1.3rem;}
       .banner ol li {width: 1rem; height: 1rem; border: 1px solid #333; background: white; border-radius: 50%; margin: 0 0.4rem; opacity: 0.6rem; float: left;}
       .banner ol li.active {background: #ff5501; border: 1px solid #d0a793; opacity: 1;}
+
+      /**/
+      .page_content {background: white; position: relative; top: -5rem;}
+      .load {height: 5rem; line-height: 5rem; text-align: center; font-size: 2rem;}
     </style>
     <script>
-    window.onresize=function () {
+      window.onresize=function () {
       document.documentElement.style.fontSize=document.documentElement.clientWidth/41.4+'px';
-    }
+    };
       window.onresize();
+
+      window.onload=function(){
+        //引入
+        let oBanner=document.querySelector('.banner');
+        let oBannerUl=oBanner.children[0];
+        let oBannerUlLi=oBannerUl.children;
+        let oPageContent=document.querySelector('.page_content');
+        let oLoad=document.querySelector('.load');
+        let aOlLi=document.querySelectorAll('.banner ol li');
+
+        //给bannerUL结尾填循环图
+        oBannerUl.appendChild(oBannerUlLi[0].cloneNode(true));
+        //给bannerUL之前填循环图
+        oBannerUl.insertBefore(oBannerUlLi[oBannerUlLi.length-2].cloneNode(true),oBannerUlLi[0]);
+
+        //坐标变量，x移动banner，y移动页面
+        //let x=0,y=0;
+        let x = -oBannerUlLi[0].offsetWidth,y=0;
+
+        //添加事件
+        oBanner.addEventListener('touchstart', function(ev) {
+
+          oPageContent.style.transition='none';
+          oBannerUl.style.transition='none';
+
+          let staryX=ev.targetTouches[0].clientX;
+          let staryY=ev.targetTouches[0].clientY;
+
+          let disX=staryX-x;
+          let disY=staryY-y;
+
+          //方向变量
+          let dir='';
+
+          function fnMove(ev) {
+            //判定方向
+            if (dir=='') {
+              if (Math.abs(ev.targetTouches[0].clientX-staryX)>=5){
+                dir='x';
+              } else if (Math.abs(ev.targetTouches[0].clientY-staryY)>=5){
+                dir='y';
+              }
+            }else{
+              //确定方向后
+              if (dir=='x') {
+                x=ev.targetTouches[0].clientX-disX;
+              } else {
+                y=ev.targetTouches[0].clientY-disY;
+              }
+
+              //移动的x就是bannerUl的值
+              oBannerUl.style.transform=`translateX(${x}px)`;
+
+              //限制拖动距离
+              if (y>0) {
+                oPageContent.style.transform=`translateY(${y/3}px)`;
+
+                if (y>200) {
+                  oLoad.innerHTML='松手';
+                }else {
+                  oLoad.innerHTML='下拉刷新2';
+                }
+              } else {
+                oPageContent.style.transform=`translateY(${y}px)`;
+              }
+            }
+          }
+
+          function fnEnd() {
+            //消除事件
+            oBanner.removeEventListener('touchmove', fnMove, false);
+            oBanner.removeEventListener('touchend', fnEnd, false);
+
+            //拖动结束自动返回位置
+            if (y>0) {
+              y=0;
+              oPageContent.style.transition='0.3s all ease';
+              oPageContent.style.transform=`translateY(0px)`;
+            }
+
+            //判定x停留在第几张
+            let n = Math.round(-x/oBannerUl.children[0].offsetWidth);
+            x=-n*oBannerUl.children[0].offsetWidth;
+
+            console.log(n);
+
+            if (n == -(imgCount+1) * x) {
+              n = -x
+            }else if (n === 0) {
+              n =  -imgCount * x
+            }
+
+            oBannerUl.style.transition='0.3s all ease';
+            oBannerUl.style.transform=`translateX(${x}px)`;
+
+            //图片下圆点处理
+            Array.from(aOlLi).forEach((li,index) => {
+              li.className=index==n?'active':'';
+
+            })
+
+          }
+
+          oBanner.addEventListener('touchmove', fnMove, false);
+          oBanner.addEventListener('touchend', fnEnd, false);
+        },false);
+      };
     </script>
   </head>
   <body>
     <header>
       <h1>淘宝网</h1>
     </header>
-    <section class="banner">
-      <ul>
-        <li><img src="img/banner1.jpg" /></li>
-        <li><img src="img/banner2.jpg" /></li>
-        <li><img src="img/banner3.jpg" /></li>
-      </ul>
-      <ol>
-        <li class="active"></li>
-        <li></li>
-        <li></li>
-      </ol>
-    </section>
-    <nav>
+    <div class="load">
+      下拉刷新
+    </div>
+    <div class="page_content">
+      <section class="banner">
+        <ul>
+          <li><img src="img/banner1.jpg" /></li>
+          <li><img src="img/banner2.jpg" /></li>
+          <li><img src="img/banner3.jpg" /></li>
+        </ul>
+        <ol>
+          <li class="active"></li>
+          <li></li>
+          <li></li>
+        </ol>
+      </section>
+      <nav>
 
-    </nav>
+      </nav>
+    </div>
   </body>
 </html>
